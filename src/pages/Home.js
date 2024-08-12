@@ -1,47 +1,60 @@
-import { useState, useEffect } from "react"
+import {  useState } from "react"
+import Card from "react-bootstrap/Card"
 import Form from "react-bootstrap/Form"
+import Button from "react-bootstrap/Button"
 
 
 const Home = ()=>{
 
     const [ coinData, setCoinData ] = useState({
         name: '',
-        price: 0,
+        price: '---',
     })
-
-    useEffect(()=>{
-
-        if( coinData.name.length() === 3 ){
+    
+    const fetchProductData = async(e)=>{
+        e.preventDefault()
+        if( coinData.name.length > 2 ){
             const fetchData = async ()=>{
-                const response = await fetch(`https://api.coinbase.com/api/v3/brokerage/products/${coinData.name}`,
+                const response = await fetch(`http://localhost:5050/cat/product`,
                     {
                         method: "GET",
                         headers:{
                             "Content-Type":"application/json"
                         },
-                        Authorization: "Bearer Token"
                     }
                 )
-        
                 const data = response.json()
                 console.log(data)
+                
             }
             fetchData()
+        } else {
+            setCoinData({...coinData, price: '---'})
         }
-    }, [coinData.name])
+        
+    }
 
-
-
+    
     return(
-
+        
         <>
-            <Form>
+            <Form onSubmit={(e)=>fetchProductData(e)}>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label>Search Crypto Coin</Form.Label>
                     <Form.Control type="text" placeholder="Enter TOKEN TICKER, i.e. BTC" onChange={(e)=> setCoinData({...coinData, name: (e.target.value).toUpperCase()+"-USD"})}/>
                 </Form.Group>
             </Form>
-            {coinData.name}
+            <Card>
+                <Card.Body>
+                    Name {coinData.name}    
+                </Card.Body>
+                 <Card.Body>
+                    Price {coinData.price}    
+                </Card.Body>
+                
+            </Card>
+            <Button type="submit">Search</Button>
+        
         </>
     )
 }
